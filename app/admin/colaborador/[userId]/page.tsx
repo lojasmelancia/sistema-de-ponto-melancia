@@ -1,5 +1,6 @@
 import { AddEntryDialog } from "@/components/admin/add-entry-dialog"
 import { AdminHistoryTable } from "@/components/admin/admin-history-table"
+import { PrintReportButton } from "@/components/admin/print-report-button"
 import { AppHeader } from "@/components/app-header"
 import { SummaryCards } from "@/components/summary-cards"
 import { Badge } from "@/components/ui/badge"
@@ -47,11 +48,26 @@ export default async function ColaboradorPage({
       <AppHeader userName={admin.name} roleLabel="Administrador" />
 
       <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-6">
-        <div>
+        <div className="hidden print:flex print:items-center print:justify-between print:border-b print:pb-4">
+          <div className="flex items-center gap-3">
+            <img src="/melancia-logo.png" alt="Melancia Foto e Presentes" className="size-16 object-cover" />
+            <div>
+              <p className="text-xl font-bold">Melancia Foto e Presentes</p>
+              <p className="text-sm">Relatório mensal de folha de ponto</p>
+            </div>
+          </div>
+          <div className="text-right text-sm">
+            <p className="font-semibold">Colaborador</p>
+            <p>{member.name}</p>
+            <p>Emitido em {new Date().toLocaleDateString("pt-BR")}</p>
+          </div>
+        </div>
+
+        <div className="print-hidden">
           <Button
             variant="ghost"
             size="sm"
-            className="-ml-2 mb-2"
+            className="-ml-2 mb-2 print-hidden"
             nativeButton={false}
             render={<Link href="/admin" />}
           >
@@ -77,7 +93,10 @@ export default async function ColaboradorPage({
                 {scheduled > 0 && ` (${formatMinutes(scheduled)}/dia)`}
               </p>
             </div>
-            <AddEntryDialog member={member} />
+            <div className="flex flex-wrap gap-2 print-hidden">
+              <AddEntryDialog member={member} />
+              <PrintReportButton />
+            </div>
           </div>
         </div>
 
@@ -106,6 +125,15 @@ export default async function ColaboradorPage({
             <AdminHistoryTable entries={entries} member={member} />
           </CardContent>
         </Card>
+
+        <div className="hidden print:grid print:grid-cols-2 print:gap-12 print:pt-16">
+          <div className="border-t border-foreground pt-2 text-center text-sm">
+            Assinatura do colaborador
+          </div>
+          <div className="border-t border-foreground pt-2 text-center text-sm">
+            Assinatura do responsável
+          </div>
+        </div>
       </main>
     </div>
   )
