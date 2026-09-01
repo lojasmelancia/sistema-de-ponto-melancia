@@ -1,3 +1,4 @@
+import { adminExists } from "@/app/actions/setup"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { LoginForm } from "@/components/login-form"
 import { MelanciaLogo } from "@/components/melancia-logo"
@@ -7,6 +8,9 @@ import { redirect } from "next/navigation"
 export default async function SignInPage() {
   const session = await getSession()
   if (session?.user) redirect("/")
+
+  // Sem administrador cadastrado ainda: envia para a configuração inicial.
+  if (!(await adminExists())) redirect("/setup")
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-secondary/40 px-4 py-12">

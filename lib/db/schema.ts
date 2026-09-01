@@ -39,6 +39,8 @@ export const account = pgTable("account", {
   id: text("id").primaryKey(),
   accountId: text("accountId").notNull(),
   providerId: text("providerId").notNull(),
+  // Exigido pelo Better Auth 1.7 (identidade da conta escopada por issuer).
+  issuer: text("issuer").notNull().default(""),
   userId: text("userId")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),

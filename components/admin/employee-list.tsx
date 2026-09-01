@@ -71,6 +71,7 @@ export function EmployeeList({ members }: { members: Staff[] }) {
                     <Button
                       variant="outline"
                       size="sm"
+                      nativeButton={false}
                       render={
                         <Link href={`/admin/colaborador/${member.userId}`} />
                       }

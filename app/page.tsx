@@ -1,9 +1,15 @@
+import { adminExists } from "@/app/actions/setup"
 import { getCurrentStaff, getSession } from "@/lib/session"
 import { redirect } from "next/navigation"
 
 export default async function Home() {
   const session = await getSession()
-  if (!session?.user) redirect("/sign-in")
+  if (!session?.user) {
+    // Enquanto não houver administrador, o primeiro acesso vai para a
+    // configuração inicial em vez da tela de login.
+    if (!(await adminExists())) redirect("/setup")
+    redirect("/sign-in")
+  }
 
   const profile = await getCurrentStaff()
 

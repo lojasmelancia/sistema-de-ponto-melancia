@@ -7,6 +7,7 @@ import { requireAdmin } from "@/lib/session"
 import { parseHHMM } from "@/lib/time-utils"
 import { and, eq } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
+import { cookies } from "next/headers"
 
 // ---------------------------------------------------------------------------
 // Criar colaborador (cria conta Better Auth + perfil de staff)
@@ -38,6 +39,16 @@ export async function createEmployee(formData: FormData) {
     }
   }
 
+  // O signUpEmail cria uma sessão para o novo usuário e, via plugin
+  // nextCookies, sobrescreve o cookie de sessão do admin — o que o
+  // deslogaria. Guardamos os cookies de sessão do admin antes e os
+  // restauramos depois para manter o administrador logado.
+  const cookieStore = await cookies()
+  const adminAuthCookies = cookieStore
+    .getAll()
+    .filter((c) => c.name.includes("better-auth"))
+    .map((c) => ({ name: c.name, value: c.value }))
+
   // Cria o usuário via Better Auth (hash de senha gerenciado pela lib).
   let userId: string
   try {
@@ -48,6 +59,18 @@ export async function createEmployee(formData: FormData) {
   } catch (err) {
     console.log("[v0] createEmployee signUp error:", err)
     return { error: "Não foi possível criar a conta. O e-mail já pode estar em uso." }
+  }
+
+  // Restaura a sessão do administrador (desfaz o login automático do novo
+  // colaborador no navegador de quem está cadastrando).
+  const isDev = process.env.NODE_ENV === "development"
+  for (const c of adminAuthCookies) {
+    cookieStore.set(c.name, c.value, {
+      httpOnly: true,
+      path: "/",
+      secure: true,
+      sameSite: isDev ? "none" : "lax",
+    })
   }
 
   await db.insert(staff).values({

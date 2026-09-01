@@ -52,6 +52,7 @@ export default async function ColaboradorPage({
             variant="ghost"
             size="sm"
             className="-ml-2 mb-2"
+            nativeButton={false}
             render={<Link href="/admin" />}
           >
             <ArrowLeft className="size-4" />
