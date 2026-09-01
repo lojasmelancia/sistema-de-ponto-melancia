@@ -68,11 +68,15 @@ export function EmployeeList({ members }: { members: Staff[] }) {
                       <Pencil className="size-4" />
                       <span className="sr-only sm:not-sr-only">Editar</span>
                     </Button>
-                    <Button variant="outline" size="sm" asChild>
-                      <Link href={`/admin/colaborador/${member.userId}`}>
-                        Ponto
-                        <ChevronRight className="size-4" />
-                      </Link>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      render={
+                        <Link href={`/admin/colaborador/${member.userId}`} />
+                      }
+                    >
+                      Ponto
+                      <ChevronRight className="size-4" />
                     </Button>
                   </div>
                 </TableCell>

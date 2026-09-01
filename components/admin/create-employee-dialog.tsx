@@ -42,11 +42,9 @@ export function CreateEmployeeDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>
-          <UserPlus className="size-4" />
-          Novo colaborador
-        </Button>
+      <DialogTrigger render={<Button />}>
+        <UserPlus className="size-4" />
+        Novo colaborador
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <form onSubmit={handleSubmit}>
