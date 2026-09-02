@@ -7,7 +7,9 @@ function resolveBaseURL() {
   if (process.env.VERCEL_PROJECT_PRODUCTION_URL)
     return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
-  return process.env.V0_RUNTIME_URL
+  if (process.env.V0_RUNTIME_URL) return process.env.V0_RUNTIME_URL
+  if (process.env.BOLT_ORIGIN) return process.env.BOLT_ORIGIN
+  return undefined
 }
 
 function resolveTrustedOrigins() {
@@ -19,6 +21,8 @@ function resolveTrustedOrigins() {
       "V0_DEV_APP_URL",
       "V0_BUILD_URL",
       "V0_SANDBOX_URL",
+      "BOLT_ORIGIN",
+      "BOLT_SERVER_URL",
     ]) {
       const value = process.env[key]
       if (value) origins.push(value)
@@ -27,6 +31,10 @@ function resolveTrustedOrigins() {
     for (const key of ["VERCEL_URL", "VERCEL_PROJECT_PRODUCTION_URL"]) {
       const value = process.env[key]
       if (value) origins.push(`https://${value}`)
+    }
+    for (const key of ["BOLT_ORIGIN", "BOLT_SERVER_URL"]) {
+      const value = process.env[key]
+      if (value) origins.push(value)
     }
   }
   return origins

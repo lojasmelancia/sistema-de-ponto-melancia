@@ -4,11 +4,11 @@ export function MelanciaLogo({ className }: { className?: string }) {
   return (
     <span className={`inline-flex items-center ${className ?? ""}`}>
       <Image
-        src="/melancia-logo.png"
+        src="/melancia-logo.svg"
         alt="Melancia Foto e Presentes"
-        width={80}
-        height={80}
-        className="size-14 rounded-md object-cover"
+        width={56}
+        height={56}
+        className="size-14 rounded-md object-contain"
         priority
       />
     </span>
