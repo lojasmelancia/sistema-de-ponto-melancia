@@ -20,14 +20,27 @@ export function formatMinutes(totalMinutes: number, withSign = false): string {
   return `${sign}${h}h ${String(m).padStart(2, "0")}min`
 }
 
-/** Formata um Date em "HH:MM" no fuso local do servidor/preview. */
+/** Formata horários sempre no fuso oficial da loja (Brasília). */
 export function formatTime(date: Date | string | null | undefined): string {
   if (!date) return "--:--"
   const d = typeof date === "string" ? new Date(date) : date
   return d.toLocaleTimeString("pt-BR", {
+    timeZone: "America/Sao_Paulo",
     hour: "2-digit",
     minute: "2-digit",
   })
+}
+
+/** Cria um Date com o horário de parede de Brasília, independente do servidor. */
+export function nowInBrasilia(): Date {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Sao_Paulo",
+    year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", second: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(new Date())
+  const get = (type: string) => Number(parts.find((p) => p.type === type)?.value)
+  return new Date(get("year"), get("month") - 1, get("day"), get("hour"), get("minute"), get("second"))
 }
 
 function diffMinutes(start: Date | null, end: Date | null): number {
@@ -49,9 +62,12 @@ export interface DayCalculation {
  * Jornada cadastrada em minutos, descontando o almoço previsto.
  * Ex.: 08:00 -> 18:00 com almoço 12:00-13:00 = 9h.
  */
-export function scheduledMinutesForStaff(member: Staff): number {
-  const entry = parseHHMM(member.entryTime)
-  const exit = parseHHMM(member.exitTime)
+export function scheduledMinutesForStaff(member: Staff, workDate?: string): number {
+  const isSaturday = workDate
+    ? new Date(`${workDate}T12:00:00`).getDay() === 6
+    : false
+  const entry = parseHHMM(isSaturday ? member.saturdayEntryTime : member.entryTime)
+  const exit = parseHHMM(isSaturday ? member.saturdayExitTime : member.exitTime)
   if (entry === null || exit === null) return 0
   let total = exit - entry
   const ls = parseHHMM(member.lunchStart)
@@ -81,7 +97,7 @@ export function calculateDay(entry: TimeEntry, member: Staff): DayCalculation {
   const grossMinutes = Math.max(0, diffMinutes(clockIn, clockOut))
   const workedMinutes = Math.max(0, grossMinutes - lunchMinutes)
 
-  const scheduledMinutes = scheduledMinutesForStaff(member)
+  const scheduledMinutes = scheduledMinutesForStaff(member, entry.workDate)
   const complete = Boolean(clockIn && clockOut)
 
   const balanceMinutes = complete ? workedMinutes - scheduledMinutes : 0
@@ -131,13 +147,12 @@ export function aggregateDays(
   }
 }
 
-/** Data de hoje em formato YYYY-MM-DD (fuso local). */
+/** Data de hoje em formato YYYY-MM-DD no fuso de Brasília. */
 export function todayISO(): string {
-  const now = new Date()
-  const y = now.getFullYear()
-  const m = String(now.getMonth() + 1).padStart(2, "0")
-  const d = String(now.getDate()).padStart(2, "0")
-  return `${y}-${m}-${d}`
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Sao_Paulo",
+    year: "numeric", month: "2-digit", day: "2-digit",
+  }).format(new Date())
 }
 
 /** Formata YYYY-MM-DD em "dd/mm/aaaa". */

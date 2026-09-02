@@ -24,6 +24,10 @@ export async function createEmployee(formData: FormData) {
   const lunchStart = String(formData.get("lunchStart") ?? "").trim() || null
   const lunchEnd = String(formData.get("lunchEnd") ?? "").trim() || null
   const exitTime = String(formData.get("exitTime") ?? "").trim() || null
+  const saturdayEntryTime = String(formData.get("saturdayEntryTime") ?? "").trim() || null
+  const saturdayLunchStart = String(formData.get("saturdayLunchStart") ?? "").trim() || null
+  const saturdayLunchEnd = String(formData.get("saturdayLunchEnd") ?? "").trim() || null
+  const saturdayExitTime = String(formData.get("saturdayExitTime") ?? "").trim() || null
 
   if (!name || !email || password.length < 8) {
     return { error: "Preencha nome, e-mail e uma senha de ao menos 8 caracteres." }
@@ -33,6 +37,10 @@ export async function createEmployee(formData: FormData) {
     ["início do almoço", lunchStart],
     ["fim do almoço", lunchEnd],
     ["saída", exitTime],
+    ["entrada de sábado", saturdayEntryTime],
+    ["almoço de sábado", saturdayLunchStart],
+    ["retorno de sábado", saturdayLunchEnd],
+    ["saída de sábado", saturdayExitTime],
   ] as const) {
     if (v && parseHHMM(v) === null) {
       return { error: `Horário de ${label} inválido. Use o formato HH:MM.` }
@@ -81,6 +89,10 @@ export async function createEmployee(formData: FormData) {
     lunchStart,
     lunchEnd,
     exitTime,
+    saturdayEntryTime,
+    saturdayLunchStart,
+    saturdayLunchEnd,
+    saturdayExitTime,
   })
 
   revalidatePath("/admin")
@@ -99,10 +111,14 @@ export async function updateEmployee(formData: FormData) {
   const lunchStart = String(formData.get("lunchStart") ?? "").trim() || null
   const lunchEnd = String(formData.get("lunchEnd") ?? "").trim() || null
   const exitTime = String(formData.get("exitTime") ?? "").trim() || null
+  const saturdayEntryTime = String(formData.get("saturdayEntryTime") ?? "").trim() || null
+  const saturdayLunchStart = String(formData.get("saturdayLunchStart") ?? "").trim() || null
+  const saturdayLunchEnd = String(formData.get("saturdayLunchEnd") ?? "").trim() || null
+  const saturdayExitTime = String(formData.get("saturdayExitTime") ?? "").trim() || null
   const active = formData.get("active") === "on" || formData.get("active") === "true"
 
   if (!staffId || !name) return { error: "Dados inválidos." }
-  for (const v of [entryTime, lunchStart, lunchEnd, exitTime]) {
+  for (const v of [entryTime, lunchStart, lunchEnd, exitTime, saturdayEntryTime, saturdayLunchStart, saturdayLunchEnd, saturdayExitTime]) {
     if (v && parseHHMM(v) === null) {
       return { error: "Horário inválido. Use o formato HH:MM." }
     }
@@ -110,7 +126,7 @@ export async function updateEmployee(formData: FormData) {
 
   await db
     .update(staff)
-    .set({ name, entryTime, lunchStart, lunchEnd, exitTime, active })
+    .set({ name, entryTime, lunchStart, lunchEnd, exitTime, saturdayEntryTime, saturdayLunchStart, saturdayLunchEnd, saturdayExitTime, active })
     .where(eq(staff.id, staffId))
 
   revalidatePath("/admin")
@@ -125,8 +141,8 @@ function combineDateTime(workDate: string, hhmm: string | null): Date | null {
   const minutes = parseHHMM(hhmm)
   if (minutes === null) return null
   const [y, m, d] = workDate.split("-").map(Number)
-  const date = new Date(y, m - 1, d, Math.floor(minutes / 60), minutes % 60, 0, 0)
-  return date
+  // Converte o horário de parede de Brasília para o instante UTC.
+  return new Date(Date.UTC(y, m - 1, d, Math.floor(minutes / 60) + 3, minutes % 60, 0, 0))
 }
 
 export async function updateTimeEntry(formData: FormData) {

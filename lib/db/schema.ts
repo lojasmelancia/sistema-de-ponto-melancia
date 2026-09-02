@@ -79,6 +79,10 @@ export const staff = pgTable("staff", {
   lunchStart: text("lunchStart"), // "12:00"
   lunchEnd: text("lunchEnd"), // "13:00"
   exitTime: text("exitTime"), // "18:00"
+  saturdayEntryTime: text("saturdayEntryTime"), // "09:00"
+  saturdayLunchStart: text("saturdayLunchStart"), // "12:00"
+  saturdayLunchEnd: text("saturdayLunchEnd"), // "13:00"
+  saturdayExitTime: text("saturdayExitTime"), // "16:00"
   active: boolean("active").notNull().default(true),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
 })

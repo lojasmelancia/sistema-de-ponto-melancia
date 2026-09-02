@@ -109,6 +109,13 @@ export function EditEmployeeDialog({
                 />
               </div>
             </div>
+            <div className="grid grid-cols-2 gap-3 rounded-lg border bg-muted/40 p-3">
+              <p className="col-span-2 text-xs font-medium text-muted-foreground">Jornada de sábado</p>
+              <div className="grid gap-1.5"><Label htmlFor="saturdayEntryTime" className="text-xs">Entrada</Label><Input id="saturdayEntryTime" name="saturdayEntryTime" type="time" defaultValue={member.saturdayEntryTime ?? ""} /></div>
+              <div className="grid gap-1.5"><Label htmlFor="saturdayExitTime" className="text-xs">Saída</Label><Input id="saturdayExitTime" name="saturdayExitTime" type="time" defaultValue={member.saturdayExitTime ?? ""} /></div>
+              <div className="grid gap-1.5"><Label htmlFor="saturdayLunchStart" className="text-xs">Início do almoço</Label><Input id="saturdayLunchStart" name="saturdayLunchStart" type="time" defaultValue={member.saturdayLunchStart ?? ""} /></div>
+              <div className="grid gap-1.5"><Label htmlFor="saturdayLunchEnd" className="text-xs">Fim do almoço</Label><Input id="saturdayLunchEnd" name="saturdayLunchEnd" type="time" defaultValue={member.saturdayLunchEnd ?? ""} /></div>
+            </div>
 
             <label className="flex items-center gap-2 text-sm">
               <input

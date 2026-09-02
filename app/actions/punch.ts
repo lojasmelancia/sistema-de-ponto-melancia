@@ -19,6 +19,7 @@ export async function punch(type: PunchType) {
   if (!profile.active) return { error: "Colaborador inativo." }
 
   const workDate = todayISO()
+  // Guarda o instante real; a apresentação converte para Brasília.
   const now = new Date()
 
   // Busca ou cria o registro do dia.
